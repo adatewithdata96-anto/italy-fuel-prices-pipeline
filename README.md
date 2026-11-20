@@ -3,13 +3,7 @@
 **A daily ELT pipeline that answers a simple question: _where is fuel cheapest in Italy today?_**
 Built locally with Docker and open-source tools, designed for production on AWS with Terraform.
 
-[![Ingestion](https://github.com/<your-username>/italy-fuel-prices-pipeline/actions/workflows/ingestion.yml/badge.svg)](https://github.com/<your-username>/italy-fuel-prices-pipeline/actions/workflows/ingestion.yml)
-[![dbt](https://github.com/<your-username>/italy-fuel-prices-pipeline/actions/workflows/dbt.yml/badge.svg)](https://github.com/<your-username>/italy-fuel-prices-pipeline/actions/workflows/dbt.yml)
-[![Terraform](https://github.com/<your-username>/italy-fuel-prices-pipeline/actions/workflows/terraform.yml/badge.svg)](https://github.com/<your-username>/italy-fuel-prices-pipeline/actions/workflows/terraform.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Watch on YouTube](https://img.shields.io/badge/Watch%20on-YouTube-red?logo=youtube)](<video-link>)
-
-> 🎥 This project is part of **A Date with Data**, a YouTube series where I build real data engineering projects end to end. The full walkthrough (in Italian) is [here](<video-link>).
+> 🎥 This project is part of **A Date with Data**, a YouTube series where I build real data engineering projects end to end. [here](https://www.youtube.com/@adatewithdata96).
 
 <!-- Add a screenshot once the dashboard runs: ![Dashboard preview](docs/dashboard.png) -->
 
