@@ -1,0 +1,4 @@
+# Keep Unix line endings so files work the same on Windows, macOS and inside Linux containers
+* text=auto eol=lf
+*.png binary
+*.jpg binary

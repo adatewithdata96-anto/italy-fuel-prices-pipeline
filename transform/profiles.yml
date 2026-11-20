@@ -1,0 +1,35 @@
+fuel_prices:
+  target: local
+  outputs:
+    # Local development: DuckDB reads the raw files from RustFS (S3-compatible).
+    local:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', 'fuel.duckdb') }}"
+      threads: 4
+      extensions:
+        - httpfs
+      settings:
+        s3_endpoint: "{{ env_var('DUCKDB_S3_ENDPOINT', 'localhost:9000') }}"
+        s3_access_key_id: "{{ env_var('AWS_ACCESS_KEY_ID', '') }}"
+        s3_secret_access_key: "{{ env_var('AWS_SECRET_ACCESS_KEY', '') }}"
+        s3_region: "us-east-1"
+        s3_use_ssl: false
+        s3_url_style: "path"
+
+    # CI: reads the CSV fixtures from the local file system, no S3 needed.
+    ci:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', 'ci.duckdb') }}"
+      threads: 4
+
+    # Production on AWS (see infra/aws). Requires `dbt-athena` in the image and an
+    # Athena version of the staging models: see "Production architecture" in the README.
+    # prod:
+    #   type: athena
+    #   region_name: "{{ env_var('AWS_REGION') }}"
+    #   database: awsdatacatalog
+    #   schema: "{{ env_var('ATHENA_DATABASE') }}"
+    #   work_group: "{{ env_var('ATHENA_WORKGROUP') }}"
+    #   s3_staging_dir: "{{ env_var('ATHENA_S3_STAGING_DIR') }}"
+    #   s3_data_dir: "{{ env_var('ATHENA_S3_DATA_DIR') }}"
+    #   threads: 4

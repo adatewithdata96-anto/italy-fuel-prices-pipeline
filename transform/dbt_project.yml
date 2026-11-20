@@ -1,0 +1,36 @@
+name: fuel_prices
+version: "1.0.0"
+config-version: 2
+profile: fuel_prices
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Where the raw files live. Locally: the RustFS bucket. In CI: the test fixtures.
+  raw_path: "s3://fuel-raw"
+  # Lines to skip before the header ("Estrazione del YYYY-MM-DD"). TODO: confirm with the real files.
+  csv_skip_rows: 1
+  # Freshness check: fail if the latest data is older than this many days.
+  check_freshness: true
+  freshness_max_days: 3
+
+models:
+  fuel_prices:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts
+
+seeds:
+  fuel_prices:
+    +schema: seeds

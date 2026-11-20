@@ -1,0 +1,2 @@
+# Pin exact versions with `pip freeze` once the project runs on your machine.
+dbt-duckdb>=1.9,<2.0

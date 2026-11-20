@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: dim_stations
+    description: One row per fuel station, from its most recent registry snapshot.
+    columns:
+      - name: station_id
+        description: MIMIT station identifier.
+        data_tests:
+          - unique
+          - not_null
+      - name: province
+        data_tests:
+          - not_null
+
+  - name: fct_daily_prices
+    description: >
+      Daily fuel prices. Grain: station × fuel label × service mode × day.
+      Prices are per litre, except methane and LNG (per kg): see `unit`.
+    columns:
+      - name: price_key
+        description: Surrogate key of the grain.
+        data_tests:
+          - unique
+          - not_null
+      - name: station_id
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_stations')
+              field: station_id
+              config:
+                severity: warn
+      - name: fuel_category
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['petrol', 'diesel', 'lpg', 'methane', 'lng', 'hvo', 'other']
+      - name: unit
+        data_tests:
+          - accepted_values:
+              values: ['l', 'kg']
+      - name: price_eur
+        description: Price in euro per `unit`.
+        data_tests:
+          - not_null
+          - value_between:
+              min_value: 0.3
+              max_value: 5
+      - name: days_since_communication
+        description: Days between the last price communication and the reference date.
+
+  - name: mart_province_daily_avg
+    description: Average, minimum and maximum price per day, province, fuel category and service mode (standard fuels only).
+    data_tests:
+      - unique_combination:
+          combination: "price_date, province, fuel_category, is_self_service"
+    columns:
+      - name: avg_price_eur
+        data_tests:
+          - not_null
+
+  - name: mart_cheapest_stations
+    description: The 10 cheapest stations per day, province, fuel category and service mode, with the gap from the provincial average.
+    columns:
+      - name: price_rank
+        data_tests:
+          - value_between:
+              min_value: 1
+              max_value: 10

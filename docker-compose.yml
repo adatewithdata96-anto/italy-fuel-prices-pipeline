@@ -1,0 +1,78 @@
+name: fuel-pipeline
+
+x-s3-credentials: &s3-credentials
+  AWS_ACCESS_KEY_ID: ${RUSTFS_ACCESS_KEY}
+  AWS_SECRET_ACCESS_KEY: ${RUSTFS_SECRET_KEY}
+  AWS_DEFAULT_REGION: us-east-1
+
+services:
+  # S3-compatible object storage: plays the role of Amazon S3 locally.
+  rustfs:
+    image: rustfs/rustfs:${RUSTFS_VERSION:-latest}
+    command: /data
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # web console
+    environment:
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY}
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+    volumes:
+      - rustfs-data:/data
+    restart: unless-stopped
+
+  # Daily ingestion job (run on demand: `make ingest`).
+  ingestion:
+    build: ./ingestion
+    profiles: ["jobs"]
+    depends_on: [rustfs]
+    environment:
+      <<: *s3-credentials
+      S3_ENDPOINT_URL: http://rustfs:9000
+      S3_BUCKET: ${S3_BUCKET}
+      CREATE_BUCKET: "true"
+      MIMIT_PRICES_URL: ${MIMIT_PRICES_URL}
+      MIMIT_STATIONS_URL: ${MIMIT_STATIONS_URL}
+
+  # dbt transformations (run on demand: `make transform`).
+  dbt:
+    build: ./transform
+    profiles: ["jobs"]
+    depends_on: [rustfs]
+    environment:
+      <<: *s3-credentials
+      DUCKDB_PATH: /data/fuel.duckdb
+      DUCKDB_S3_ENDPOINT: rustfs:9000
+    volumes:
+      - ./transform:/usr/app
+      - duckdb-data:/data
+
+  # dbt documentation site (`make docs`).
+  dbt-docs:
+    build: ./transform
+    profiles: ["docs"]
+    command: ["docs", "serve", "--host", "0.0.0.0", "--port", "8080"]
+    ports:
+      - "8080:8080"
+    environment:
+      DUCKDB_PATH: /data/fuel.duckdb
+    volumes:
+      - ./transform:/usr/app
+      - duckdb-data:/data
+
+  # Streamlit dashboard.
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      DUCKDB_PATH: /data/fuel.duckdb
+    volumes:
+      - duckdb-data:/data:ro
+    restart: unless-stopped
+
+volumes:
+  rustfs-data:
+  duckdb-data:

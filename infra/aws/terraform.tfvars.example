@@ -1,0 +1,8 @@
+# Copy to terraform.tfvars (ignored by git) and fill in.
+region             = "eu-west-1"
+environment        = "dev"
+github_repository  = "<your-username>/italy-fuel-prices-pipeline"
+alert_email        = "<your-email>"
+monthly_budget_usd = 10
+mimit_prices_url   = "<url copied from the MIMIT page>"
+mimit_stations_url = "<url copied from the MIMIT page>"

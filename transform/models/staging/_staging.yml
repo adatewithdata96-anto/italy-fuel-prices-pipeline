@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: stg_mimit__prices
+    description: >
+      Raw daily prices from MIMIT ("prezzo_alle_8.csv"), typed and renamed.
+      `price_date` is the date the prices were in force (8:00 AM), taken from the partition folder.
+    columns:
+      - name: station_id
+        description: MIMIT station identifier (idImpianto).
+        data_tests:
+          - not_null
+      - name: fuel_label
+        description: Fuel name as reported by the station (brand-specific for premium fuels).
+        data_tests:
+          - not_null
+      - name: price_eur
+        description: Price in euro, per litre (per kg for methane and LNG).
+        data_tests:
+          - not_null
+      - name: is_self_service
+        description: True for self-service, false for attended service.
+      - name: communicated_at
+        description: When the station last communicated this price.
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: price_date
+        data_tests:
+          - not_null
+
+  - name: stg_mimit__stations
+    description: Daily snapshots of the MIMIT station registry ("anagrafica_impianti_attivi.csv").
+    columns:
+      - name: station_id
+        data_tests:
+          - not_null
+      - name: province
+        description: Two-letter province code (e.g. BA, RM).
+      - name: latitude
+        data_tests:
+          - value_between:
+              min_value: 35
+              max_value: 48
+              config:
+                severity: warn
+      - name: longitude
+        data_tests:
+          - value_between:
+              min_value: 6
+              max_value: 19
+              config:
+                severity: warn

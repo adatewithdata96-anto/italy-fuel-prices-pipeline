@@ -1,0 +1,16 @@
+version: 2
+
+seeds:
+  - name: fuel_label_overrides
+    description: >
+      Manual mapping for fuel labels that the rules in int_prices__normalized classify wrongly.
+      Add a row when the `other` share test warns about new labels.
+    config:
+      column_types:
+        fuel_label: varchar
+        fuel_category: varchar
+    columns:
+      - name: fuel_category
+        data_tests:
+          - accepted_values:
+              values: ['petrol', 'diesel', 'lpg', 'methane', 'lng', 'hvo', 'other']

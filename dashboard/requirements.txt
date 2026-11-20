@@ -1,0 +1,4 @@
+# Pin exact versions with `pip freeze` once the project runs on your machine.
+streamlit>=1.40,<2
+duckdb>=1.1,<2
+pandas>=2.2,<3

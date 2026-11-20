@@ -1,0 +1,40 @@
+name: dbt
+
+# Runs when the dbt project changes, or when the sample raw files it is tested on change:
+# they are the contract between ingestion and dbt.
+on:
+  pull_request:
+    paths:
+      - "transform/**"
+      - "ingestion/tests/fixtures/**"
+      - ".github/workflows/dbt.yml"
+  push:
+    branches: [main]
+    paths:
+      - "transform/**"
+      - "ingestion/tests/fixtures/**"
+      - ".github/workflows/dbt.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: dbt build on fixtures
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: transform
+    env:
+      DBT_PROFILES_DIR: .
+      DUCKDB_PATH: ci.duckdb
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: dbt debug --target ci
+      - run: >
+          dbt build --target ci
+          --vars '{raw_path: "../ingestion/tests/fixtures/raw", check_freshness: false}'
