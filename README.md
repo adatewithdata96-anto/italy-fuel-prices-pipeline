@@ -295,20 +295,6 @@ italy-fuel-prices-pipeline/
 └── .env.example
 ```
 
-## What I learned
-
-<!-- Fill this in after the project: honest, specific lessons. -->
-- Sources change without notice (a separator, a whole Docker image): validating at the edge is cheaper than debugging a dashboard.
-- Separating *when data was downloaded* from *when it was valid* avoids subtle errors in time series.
-- `[your lessons here]`
-
-## Roadmap
-
-- [ ] Backfill the historical archive and orchestrate with Airflow (**Project 2** of the series)
-- [ ] Incremental dbt models for the fact table
-- [ ] Athena version of the staging models and image publishing workflow
-- [ ] Price change alerts for selected stations
-
 ## Data source and license
 
 - **Data:** MIMIT – Ministero delle Imprese e del Made in Italy, "Carburanti – Prezzi praticati e anagrafica degli impianti", released under the Italian Open Data License 2.0 (IODL 2.0).
